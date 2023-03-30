@@ -1,0 +1,37 @@
+{
+  # Name of txt files stores in data/ to run experiments on
+  # eg: ["ht09_contact", "infectious", "SFHH", "tij_InVS15"]
+  datasets: ["ht09_contact"],
+
+  # Repeat experiment for each dataset with randomly selected t0.
+  # TODO: Add support for >1
+  repeat: 1,
+
+  # beta: infects a susceptible node with probability beta.
+  # Between 0 (no infections) and 1 (all edges cause infections).
+  beta: 1,
+  # TODO: beta_end, beta_step, like a gridsearch of (start, stop, stepsize)
+
+  # delta T - t0. Enter as % of total timesteps
+  # ht09: 20,818
+  # infectious: 17,298
+  # SFHH: 70,261
+  # tij: 78,249
+  length: 10,
+  # TODO: or enter number of timesteps to use in train and predict steps
+
+  # % of length. Eg: 75 means 75% of length will be used to train and 25% to predict
+  phi: 75,
+  # TODO: phiend, phistep, like a gridsearch of (start, stop, step)
+
+  # Step 1 of plan. Eg: EMA
+  weight_function: "ema",
+  # TODO: Make these function params a list so that the different functions in the list can be compared.
+
+  # Step 2 of plan. Eg: New nodes infected at each timestep
+  metric_function: "new_infections",
+
+  # Step 3 of plan. Eg: Markov Chain
+  prediction_function: "polyfit"
+  # See https://stackoverflow.com/questions/19406049/extrapolating-data-with-numpy-python
+}
