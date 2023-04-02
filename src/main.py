@@ -1,6 +1,6 @@
 import yaml
 import numpy as np
-
+from scipy.stats import kendalltau
 import src.predict as predict_functions
 import src.metric as metric_functions
 import src.weight as weight_functions
@@ -207,6 +207,14 @@ def run_experiment(graph, beta, train_dataset, num_predict, weight_function, met
 #     plt.show()
 
 
+def compare_rankings(predicted_rankings, actual_rankings):
+    """
+    Compare predicted and actual rankings using Kendall's tau.
+    """
+    score = kendalltau(predicted_rankings, actual_rankings)
+    print(score)
+
+
 if __name__ == '__main__':
     """
     Main function.
@@ -226,3 +234,5 @@ if __name__ == '__main__':
 
         # Compare prediction with actual value
         # compare(predicted=predicted, actual=influences)
+        compare_rankings(predicted_rankings=predicted_rankings, actual_rankings=actual_rankings)
+
