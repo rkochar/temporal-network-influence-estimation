@@ -84,6 +84,8 @@ def influence_of_each_node(graph, train_dataset, beta):
     for i, edge in enumerate(train_dataset):
         if graph.nodes[edge[0]]["influence"] == -1:
             find_influence_of_node(train_dataset[i:], edge[0], graph)
+        if graph.nodes[edge[1]]["influence"] == -1:
+            find_influence_of_node(train_dataset[i:], edge[1], graph)
 
     return graph
 
