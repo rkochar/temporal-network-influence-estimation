@@ -213,8 +213,6 @@ if __name__ == '__main__':
 
     for dataset in datasets:
         influences, graph, train_dataset, predict_dataset = get_dataset(dataset=dataset, total_length=total_length, phi=phi)
-        for node in graph.nodes:
-            print(graph.nodes[node]["influence"])
         predicted = run_experiment(graph=graph,
                                    beta=beta,
                                    train_dataset=train_dataset,
