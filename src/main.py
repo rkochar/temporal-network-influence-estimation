@@ -215,6 +215,12 @@ def compare_rankings(predicted_rankings, actual_rankings):
     print(score)
 
 
+def get_node_ranking(graph):
+    influence_of_nodes=[(node, graph.nodes[node]["influence"]) for node in graph.nodes]
+    ranked_nodes = sorted(influence_of_nodes, key=lambda x: x[1], reverse=True)
+    return [x[0] for x in ranked_nodes]
+
+
 if __name__ == '__main__':
     """
     Main function.
@@ -223,7 +229,7 @@ if __name__ == '__main__':
 
     for dataset in datasets:
         influences, graph, train_dataset, predict_dataset = get_dataset(dataset=dataset, total_length=total_length, phi=phi)
-        influence_of_nodes = [(node, graph.nodes[node]["influence"]) for node in graph.nodes]
+        actual_rankings = get_node_ranking(graph)
         predicted = run_experiment(graph=graph,
                                    beta=beta,
                                    train_dataset=train_dataset,
