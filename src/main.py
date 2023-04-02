@@ -6,7 +6,7 @@ import src.metric as metric_functions
 import src.weight as weight_functions
 
 import networkx as nx
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from collections import Counter
 
 def get_config():
@@ -60,12 +60,46 @@ def get_dataset(dataset, total_length, phi):
     # Find influence
     graph = make_graph(dataset=dataset)
     influences = find_influence(graph=graph, edges=data[start : start + length_to_use], beta=beta)
+    graph = influence_of_each_node(graph=graph, train_dataset=data[start : start + train_length], beta=beta)
 
 # Extract parts of dataset we need.
     train_dataset = data[start:start + train_length]
     test_dataset = data[start + train_length:start + length_to_use]
 
     return influences, graph, train_dataset, test_dataset
+
+
+def influence_of_each_node(graph, train_dataset, beta):
+    """
+    Find influence of each node.
+
+    :param graph:
+    :param train_dataset:
+    :param beta:
+    :return:
+    """
+    graph.nodes[train_dataset[0][0]]["is_infected"] = True
+    graph.nodes[train_dataset[0][0]]["infected_at"] = train_dataset[0][2]
+
+    for i, edge in enumerate(train_dataset):
+        if graph.nodes[edge[0]]["influence"] == -1:
+            find_influence_of_node(train_dataset[i:], edge[0], graph)
+
+    return graph
+
+
+def find_influence_of_node(edges, node, original_graph):
+    graph = make_graph(dataset=dataset)
+    graph.nodes[node]["is_infected"] = True
+    graph.nodes[node]["infected_at"] = edges[0][2]
+    infected = 0
+
+    for edge in edges:
+        if not graph.nodes[edge[1]]['is_infected']:
+            infected += 1
+            graph.nodes[edge[1]]['is_infected'] = True
+            graph.nodes[edge[1]]['infected_at'] = edge[2]
+    original_graph.nodes[node]["influence"] = infected
 
 
 def make_graph(dataset):
@@ -79,7 +113,7 @@ def make_graph(dataset):
     graph = nx.Graph()
 
     for node in nodes:
-        graph.add_node(node, is_infected=False, infected_at=None)
+        graph.add_node(node, is_infected=False, infected_at=None, influence=-1)
 
     # for edge in dataset:
     #     graph.add_edge(edge[0], edge[1], edge[3])
@@ -158,17 +192,17 @@ def run_experiment(graph, beta, train_dataset, num_predict, weight_function, met
     return predicted
 
 
-def compare(predicted, actual):
-    """
-    Compare predicted and actual values.
-
-    :param predicted:
-    :param actual:
-    :return:
-    """
-    plt.plot(predicted, color='red')
-    plt.plot(actual[:, 1], color='blue')
-    plt.show()
+# def compare(predicted, actual):
+#     """
+#     Compare predicted and actual values.
+#
+#     :param predicted:
+#     :param actual:
+#     :return:
+#     """
+#     plt.plot(predicted, color='red')
+#     plt.plot(actual[:, 1], color='blue')
+#     plt.show()
 
 
 if __name__ == '__main__':
@@ -179,6 +213,8 @@ if __name__ == '__main__':
 
     for dataset in datasets:
         influences, graph, train_dataset, predict_dataset = get_dataset(dataset=dataset, total_length=total_length, phi=phi)
+        for node in graph.nodes:
+            print(graph.nodes[node]["influence"])
         predicted = run_experiment(graph=graph,
                                    beta=beta,
                                    train_dataset=train_dataset,
@@ -188,4 +224,4 @@ if __name__ == '__main__':
                                    predict_function=predict_function)
 
         # Compare prediction with actual value
-        compare(predicted=predicted, actual=influences)
+        # compare(predicted=predicted, actual=influences)
