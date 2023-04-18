@@ -11,13 +11,13 @@ slice_length = 400
 
 
 data = {}
-df = pd.read_csv(f'./{dataset}.txt', sep='\t', header=None, names=['source', 'destination', 'timestamp'])
+df = pd.read_csv(f'../data/{dataset}.txt', sep='\t', header=None, names=['source', 'destination', 'timestamp'])
 df = df.iloc[slice_start:slice_start + slice_length]
 
-with open('../vis/main.html.template', 'r') as f:
+with open('./main.html.template', 'r') as f:
     template = Template(f.read())
 html = template.safe_substitute(min_slider=df['timestamp'].min(), max_slider=df['timestamp'].max())
-with open('../vis/main.html', 'w') as f:
+with open('./main.html', 'w') as f:
     f.write(html)
 
 src = df['source']
@@ -29,5 +29,5 @@ data['nodes'] = [{ 'id': int(node) } for node in nodes]
 data['edges'] = [{ 'from': int(s), 'to': int(d), 'ts': int(t) } for s, d, t in zip(src, dst, ts)]
 
 out = 'data = ' + json.dumps(data)
-with open('../vis/data.js', 'w') as f:
+with open('./data.js', 'w') as f:
     f.write(out)
